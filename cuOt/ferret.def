@@ -1,0 +1,21 @@
+Bootstrap: docker
+From: nvidia/cuda:12.3.2-devel-ubuntu22.04
+%post
+    apt-get update && \
+        apt-get -y install build-essential libsodium-dev valgrind vim
+
+%files
+    cuOT/gpu /home/gpuot/gpu
+    cuOT/ferret /home/gpuot/ferret
+ 
+%post
+    cd /home/gpuot/gpu
+    make -j -s
+
+    cd /home/gpuot/silent
+    chmod +x ferret.sh
+    make -j -s
+
+%runscript
+    cd /home/gpuot/ferret
+    ./ferret.sh
