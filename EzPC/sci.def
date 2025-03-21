@@ -7,12 +7,12 @@ From: ubuntu:22.04
         cmake git wget vim apt-utils libmpfr-dev libssl-dev libgmp-dev
 
 %files 
-    ./SCI ezpc_dir
+    SCI ezpc_dir
 
 %post 
-    cd /ezpc_dir/SCI
+    cd ezpc_dir
     mkdir build && cd build
-    cmake -DCMAKE_INSTALL_PREFIX=./install .. [-DBUILD_TESTS=ON] [-DBUILD_NETWORKS=ON] [-DNO_REVEAL_OUTPUT=ON]
+    cmake -DCMAKE_INSTALL_PREFIX=./install ..
     cmake --build . --target install --parallel
 
 %runscript

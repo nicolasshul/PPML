@@ -7,10 +7,10 @@ set(NAME "SCI")
 option(NO_REVEAL_OUTPUT "Only output secret shares after 2PC" OFF)
 message(STATUS "Option: NO_REVEAL_OUTPUT = ${NO_REVEAL_OUTPUT}")
 
-option(BUILD_TESTS "Build tests" OFF)
+option(BUILD_TESTS "Build tests" ON)
 message(STATUS "Option: BUILD_TESTS = ${BUILD_TESTS}")
 
-option(BUILD_NETWORKS "Build networks" OFF)
+option(BUILD_NETWORKS "Build networks" ON)
 message(STATUS "Option: BUILD_NETWORKS = ${BUILD_NETWORKS}")
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -23,13 +23,9 @@ endif()
 
 add_subdirectory(src)
 
-if (BUILD_TESTS)
-    add_subdirectory(tests)
-endif()
+add_subdirectory(tests)
 
-if (BUILD_NETWORKS)
-    add_subdirectory(networks)
-endif()
+add_subdirectory(networks)
 
 set(INSTALL_DIR "${CMAKE_INSTALL_PREFIX}")
 set(BUILD_DIR "${PROJECT_SOURCE_DIR}/build")
