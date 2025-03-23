@@ -5,6 +5,9 @@ set(OPENSSL_ROOT_DIR "/usr/local/opt/openssl")
 find_package(OpenSSL REQUIRED)
 find_package(GMP REQUIRED)
 
+include_directories(${PROJECT_SOURCE_DIR}/extern/SEAL/native/src)
+include_directories(${PROJECT_SOURCE_DIR}/extern/eigen)
+
 add_library(SCI-utils INTERFACE)
 
 target_compile_options(SCI-utils

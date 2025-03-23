@@ -25,20 +25,15 @@ SOFTWARE.
 #include "defines_uniform.h"
 #include "utils/ArgMapping/ArgMapping.h"
 
-// Note of the bracket around each expression use -- if this is not there, not
-// macro expansion
+// Note of the bracket around each expression use -- if this is not there, not macro expansion
 //  can result in hard in trace bugs when expanded around expressions like 1-2.
-#define Arr1DIdxRowM(arr, s0, i) (*((arr) + (i)))
-#define Arr2DIdxRowM(arr, s0, s1, i, j) (*((arr) + (i) * (s1) + (j)))
-#define Arr3DIdxRowM(arr, s0, s1, s2, i, j, k)                                 \
-  (*((arr) + (i) * (s1) * (s2) + (j) * (s2) + (k)))
-#define Arr4DIdxRowM(arr, s0, s1, s2, s3, i, j, k, l)                          \
-  (*((arr) + (i) * (s1) * (s2) * (s3) + (j) * (s2) * (s3) + (k) * (s3) + (l)))
-#define Arr5DIdxRowM(arr, s0, s1, s2, s3, s4, i, j, k, l, m)                   \
-  (*((arr) + (i) * (s1) * (s2) * (s3) * (s4) + (j) * (s2) * (s3) * (s4) +      \
-     (k) * (s3) * (s4) + (l) * (s4) + (m)))
+#define Arr1DIdxRowM(arr,s0,i) (*((arr) + (i)))
+#define Arr2DIdxRowM(arr,s0,s1,i,j) (*((arr) + (i)*(s1) + (j)))
+#define Arr3DIdxRowM(arr,s0,s1,s2,i,j,k) (*((arr) + (i)*(s1)*(s2) + (j)*(s2) + (k)))
+#define Arr4DIdxRowM(arr,s0,s1,s2,s3,i,j,k,l) (*((arr) + (i)*(s1)*(s2)*(s3) + (j)*(s2)*(s3) + (k)*(s3) + (l)))
+#define Arr5DIdxRowM(arr,s0,s1,s2,s3,s4,i,j,k,l,m) (*((arr) + (i)*(s1)*(s2)*(s3)*(s4) + (j)*(s2)*(s3)*(s4) + (k)*(s3)*(s4) + (l)*(s4) + (m)))
 
-#define Arr2DIdxColM(arr, s0, s1, i, j) (*((arr) + (j) * (s0) + (i)))
+#define Arr2DIdxColM(arr,s0,s1,i,j) (*((arr) + (j)*(s0) + (i)))
 
 intType funcSSCons(int64_t x);
 void funcReconstruct2PCCons(signedIntType *y, const intType *x, int len);

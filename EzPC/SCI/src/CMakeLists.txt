@@ -17,6 +17,9 @@ if (NOT Eigen3_FOUND)
     find_package(Eigen3 REQUIRED NO_MODULE PATHS "${PROJECT_SOURCE_DIR}/extern/eigen/build" NO_DEFAULT_PATH)
 endif()
 
+include_directories(${PROJECT_SOURCE_DIR}/extern/SEAL/native/src)
+include_directories(${PROJECT_SOURCE_DIR}/extern/eigen)
+
 add_subdirectory(utils)
 add_subdirectory(OT)
 add_subdirectory(GC)

@@ -1,5 +1,8 @@
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+include_directories(${PROJECT_SOURCE_DIR}/extern/SEAL/native/src)
+include_directories(${PROJECT_SOURCE_DIR}/extern/eigen)
+
 macro (add_network_OT _name)
 	add_executable(${_name}-OT "main_${_name}.cpp")
     target_link_libraries(${_name}-OT SCI-OT) 

@@ -1,3 +1,6 @@
+include_directories(${PROJECT_SOURCE_DIR}/extern/SEAL/native/src)
+include_directories(${PROJECT_SOURCE_DIR}/extern/eigen)
+
 macro (add_test_OT _name)
 	add_executable(${_name}-OT "test_ring_${_name}.cpp")
     target_link_libraries(${_name}-OT SCI-OT) 
