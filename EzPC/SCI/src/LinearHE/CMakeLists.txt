@@ -33,5 +33,5 @@ target_link_libraries(SCI-LinearHE
     SCI-utils
     SEAL::seal
     OpenMP::OpenMP_CXX
-    Eigen3:eigen
+    #    Eigen3::Eigen
 )

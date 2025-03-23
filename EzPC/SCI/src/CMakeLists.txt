@@ -53,8 +53,9 @@ add_library(SCI-HE library_fixed_uniform.cpp globals.cpp)
 add_library(SCI-SecfloatML library_float_common.cpp library_float_secfloat.cpp globals_float.cpp cleartext_library_float.cpp)
 add_library(SCI-Beacon library_float_common.cpp library_float_beacon.cpp globals_float.cpp cleartext_library_float.cpp)
 
+# removed Eigen3 from here
 target_link_libraries(SCI-OT PUBLIC SCI-common SCI-LinearOT SCI-GC
-    SCI-Math SCI-BuildingBlocks SCI-FloatingPoint Eigen3)
+    SCI-Math SCI-BuildingBlocks SCI-FloatingPoint)
 target_link_libraries(SCI-HE PUBLIC SCI-common SCI-LinearHE)
 target_link_libraries(SCI-SecfloatML PUBLIC SCI-FloatingPoint) 
 target_link_libraries(SCI-Beacon PUBLIC SCI-FloatingPoint) 
