@@ -1,6 +1,6 @@
 find_package(OpenMP REQUIRED)
 
-find_package(SEAL 3.3.2 EXACT QUIET PATHS "${PROJECT_SOURCE_DIR}/build/" NO_DEFAULT_PATH)
+find_package(SEAL QUIET PATHS "${PROJECT_SOURCE_DIR}/build/" NO_DEFAULT_PATH)
 if (NOT SEAL_FOUND)
     message(STATUS "SEAL 3.3.2 was not found: clone and install SEAL locally")
     if (NOT EXISTS "${PROJECT_SOURCE_DIR}/extern/SEAL/native/src/CMakeLists.txt")
@@ -15,8 +15,11 @@ if (NOT SEAL_FOUND)
             WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/extern/SEAL/native/src")
     execute_process(COMMAND ${CMAKE_COMMAND} --build . --target install
         WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/extern/SEAL/native/src")
-    find_package(SEAL 3.3.2 EXACT REQUIRED PATHS "${PROJECT_SOURCE_DIR}/build/" NO_DEFAULT_PATH)
+find_package(SEAL REQUIRED PATHS "${PROJECT_SOURCE_DIR}/extern/SEAL/native/src/" NO_DEFAULT_PATH)
 endif()
+
+include_directories(${PROJECT_SOURCE_DIR}/extern/SEAL/native/src)
+include_directories(${PROJECT_SOURCE_DIR}/extern/eigen)
 
 add_library(SCI-LinearHE
     conv-field.cpp
@@ -28,7 +31,7 @@ add_library(SCI-LinearHE
 target_link_libraries(SCI-LinearHE
     PUBLIC
     SCI-utils
-    SEAL::seal
+    SEAL
     OpenMP::OpenMP_CXX
-    Eigen3::Eigen
+    Eigen3
 )
