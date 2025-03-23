@@ -1055,6 +1055,8 @@ FixArray FixOp::tanh(const FixArray& x, int l_y, int s_y) {
   return ret;
 }
 
-FixArray FixOp::sqrt(const FixArray& x, int l_y, int s_y, bool recp_sqrt) {
+// for some reason sqrt command is not finished, but it is not used in any function, commented out.
+
+/* FixArray FixOp::sqrt(const FixArray& x, int l_y, int s_y, bool recp_sqrt) {
   assert(x.party != PUBLIC);
-}
+} */
