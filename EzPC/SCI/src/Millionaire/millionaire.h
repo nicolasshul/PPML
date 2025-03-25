@@ -267,9 +267,12 @@ public:
     }
 
     traverse_and_compute_ANDs(num_cmps, leaf_res_eq, leaf_res_cmp);
-
-    for (int i = 0; i < old_num_cmps; i++)
+    std::cout << "reaches all the way here" << std::endl;
+    for (int i = 0; i < old_num_cmps; i++) {
+      std::cout << leaf_res_cmp[i] << " ";
       res[i] = leaf_res_cmp[i];
+    }
+    std::cout << std::endl;
 
     // Cleanup
     if (old_num_cmps != num_cmps)

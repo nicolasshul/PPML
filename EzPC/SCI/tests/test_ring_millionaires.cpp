@@ -7,7 +7,7 @@ using namespace sci;
 using namespace std;
 
 int party, port = 32000;
-int bitlength = 32;
+int bitlength = 64;
 int num_threads = 1;
 int num_cmps = 8;
 string address = "127.0.0.1";
@@ -35,12 +35,11 @@ int main(int argc, char **argv) {
 
     if (party == ALICE) {
         prg.random_data(data, num_cmps * sizeof(uint64_t));
-        prg.random_data(res, num_cmps * sizeof(uint8_t));
         
         uint64_t comm_start = iopack->get_comm();
         auto start = clock_start();
 
-        millionaire_proc.compare(res, *data, num_cmps, bitlength,
+        millionaire_proc.compare(res, data, num_cmps, bitlength,
                 true, false, 4);
         
         long long t = time_from(start);
@@ -54,22 +53,27 @@ int main(int argc, char **argv) {
 
         std::cout << "Checking Millionaire's correctness" << std::endl;
         uint64_t *data_BOB = new uint64_t[num_cmps];
-        uint8_t *res_BOB = new uint_t[num_cmps];
-        iopackArr[0]->io->recv_data(data_BOB, num_cmps * sizeof(uint64_t));
-        iopackArr[0]->io->recv_data(res_BOB, num_cmps * sizeof(uint8_t));
+        uint8_t *res_BOB = new uint8_t[num_cmps];
+        iopack->io->recv_data(data_BOB, num_cmps * sizeof(uint64_t));
+        iopack->io->recv_data(res_BOB, num_cmps * sizeof(uint8_t));
         for (int i = 0; i < num_cmps; i++) {
-            std::cout << rec[i];
-        }
-
+	    if ((data[i] > data_BOB[i]) == (res[i] ^ res_BOB[i])) {
+		printf("m success");
+	    } 
+	    else {
+		printf("m failed ");
+	    }
+	    printf(" res: %u", res[i]);
+            std::cout << " ALICE data: " << data[i] << " BOB data: " << data_BOB[i] << std::endl;
+        }	
     }
     else { // party == BOB
         prg.random_data(data, num_cmps * sizeof(uint64_t));
-        prg.random_data(res, num_cmps * sizeof(uint8_t));
         
         uint64_t comm_start = iopack->get_comm();
         auto start = clock_start();
 
-        millionaire_proc.compare(res, *data, num_cmps, bitlength,
+        millionaire_proc.compare(res, data, num_cmps, bitlength,
                 true, false, 4);
         
         long long t = time_from(start);
@@ -81,8 +85,8 @@ int main(int argc, char **argv) {
          << (comm_end - comm_start) * 8 << " bits" << RESET << endl;
         std::cout << "BOB: Done Millionaire protocol execution" << std::endl;
 
-        iopackArr[0]->io->send_data(data, num_cmps * sizeof(uint64_t));
-        iopackArr[0]->io->send_data(res, num_cmps * sizeof(uint8_t));
+        iopack->io->send_data(data, num_cmps * sizeof(uint64_t));
+        iopack->io->send_data(res, num_cmps * sizeof(uint8_t));
     }
     return 0;
 }
