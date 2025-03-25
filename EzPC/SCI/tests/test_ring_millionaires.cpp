@@ -23,15 +23,14 @@ int main(int argc, char **argv) {
     amap.arg("ip", address, "IP Address of server (ALICE)");
 
     amap.parse(argc, argv);
-
+    PRG128 prg;
     IOPack *iopack = new IOPack(party, port, address);
 
     OTPack otpack(iopack, party);
 
-    MillionaireProtocol millionaire_proc(party, iopack, &otpack, bitlength, radix_base = 4);
+    MillionaireProtocol millionaire_proc(party, iopack, &otpack, bitlength, MILL_PARAM);
     
-    // only do one comparison
-    uint8_t *data = new uint64_t[num_cmps];
+    uint64_t *data = new uint64_t[num_cmps];
     uint8_t *res = new uint8_t[num_cmps];
 
     if (party == ALICE) {
@@ -42,8 +41,7 @@ int main(int argc, char **argv) {
         auto start = clock_start();
 
         millionaire_proc.compare(res, *data, num_cmps, bitlength,
-                greater_than = true, equality = false,
-                radix_base = MILL_PARAM);
+                true, false, 4);
         
         long long t = time_from(start);
         uint64_t comm_end = iopack->get_comm();
@@ -53,6 +51,16 @@ int main(int argc, char **argv) {
         cout << "ALICE communication\t" << BLUE
          << (comm_end - comm_start) * 8 << " bits" << RESET << endl;
         std::cout << "ALICE: Done Millionaire protocol execution" << std::endl;
+
+        std::cout << "Checking Millionaire's correctness" << std::endl;
+        uint64_t *data_BOB = new uint64_t[num_cmps];
+        uint8_t *res_BOB = new uint_t[num_cmps];
+        iopackArr[0]->io->recv_data(data_BOB, num_cmps * sizeof(uint64_t));
+        iopackArr[0]->io->recv_data(res_BOB, num_cmps * sizeof(uint8_t));
+        for (int i = 0; i < num_cmps; i++) {
+            std::cout << rec[i];
+        }
+
     }
     else { // party == BOB
         prg.random_data(data, num_cmps * sizeof(uint64_t));
@@ -62,8 +70,7 @@ int main(int argc, char **argv) {
         auto start = clock_start();
 
         millionaire_proc.compare(res, *data, num_cmps, bitlength,
-                greater_than = true, equality = false,
-                radix_base = MILL_PARAM);
+                true, false, 4);
         
         long long t = time_from(start);
         uint64_t comm_end = iopack->get_comm();
@@ -73,6 +80,9 @@ int main(int argc, char **argv) {
         cout << "BOB communication\t" << BLUE
          << (comm_end - comm_start) * 8 << " bits" << RESET << endl;
         std::cout << "BOB: Done Millionaire protocol execution" << std::endl;
+
+        iopackArr[0]->io->send_data(data, num_cmps * sizeof(uint64_t));
+        iopackArr[0]->io->send_data(res, num_cmps * sizeof(uint8_t));
     }
     return 0;
 }
