@@ -13,15 +13,15 @@ int num_cmps = 8;
 string address = "127.0.0.1";
 
 
-void compare(MillionaireProtocol millionaire_proc, int num_cmps, uint64_t *alice_data, uint64_t *bob_data, IOPack *iopack, mill_timer *timer) {
+void compare(MillionaireProtocol millionaire_proc, int num_cmps, uint64_t *alice_data, uint64_t *bob_data, IOPack *iopack) {
     struct mill_timer timer = { 0 };
-    struct mill_timer *p_timer = timer;
+    struct mill_timer *p_timer = &timer;
     uint8_t *res = new uint8_t[num_cmps];
     if (party == ALICE) {
         uint64_t *data = alice_data;
 
-        millionaire_proc.compare(res, data, num_cmps, bitlength,
-                true, false, 4, p_timer);
+        millionaire_proc.compare(res, data, num_cmps, bitlength, p_timer,
+                true, false, 4);
         
         std::cout << "Checking Millionaire's correctness" << std::endl;
         
@@ -47,20 +47,20 @@ void compare(MillionaireProtocol millionaire_proc, int num_cmps, uint64_t *alice
             printf("Bitlength < beta: %f", timer.bitlength_less_than_beta);
         } 
         else {
-            printf("Total Time Alice: %f\n", timer.alice_total * 1e6);
-            printf("Total Time Bob: %f s\n", timer.bob_total * 1e6);
-            printf("Extracting data: %f s\n", timer.extracting_data * 1e6);
-            printf("Setting Leaf OTs: %f s\n", timer.set_leaf_ots * 1e6);
-            printf("Alice preforming Leaf OTs: %f s\n", timer.alice_preform_leaf_ots * 1e6);
-            printf("Bob preforming Leaf OTs: %f s\n", timer.bob_preform_leaf_ots * 1e6);
-            printf("Extracting results from OTs: %f s\n", timer.extract_result * 1e6);
+            printf("Total Time Alice: %f\n", timer.alice_total * 1e-3);
+            printf("Total Time Bob: %f s\n", timer.bob_total * 1e-3);
+            printf("Extracting data: %f s\n", timer.extracting_data * 1e-3);
+            printf("Setting Leaf OTs: %f s\n", timer.set_leaf_ots * 1e-3);
+            printf("Alice preforming Leaf OTs: %f s\n", timer.alice_preform_leaf_ots * 1e-3);
+            printf("Bob preforming Leaf OTs: %f s\n", (timer.bob_total - timer.extract_result) * 1e-3);
+            printf("Extracting results from OTs: %f s\n", timer.extract_result * 1e-3);
         }
     }
     else { // party == BOB
         uint64_t *data = bob_data;
 
-        millionaire_proc.compare(res, data, num_cmps, bitlength,
-                true, false, 4, p_timer);
+        millionaire_proc.compare(res, data, num_cmps, bitlength, p_timer,
+                true, false, 4);
 
         //double bob_timer_data[] = {bob_timer.bob_total, bob_timer.extract_result, bob_timer.bob_preform_leaf_ots};
         //iopack->io->send_data(bob_timer_data, sizeof(mill_timer));
@@ -92,4 +92,3 @@ int main(int argc, char **argv) {
 
     compare(millionaire_proc, num_cmps, alice_data, bob_data, iopack);
 }
-    

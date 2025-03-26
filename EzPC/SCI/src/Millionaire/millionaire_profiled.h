@@ -32,7 +32,7 @@ SOFTWARE.
 #define MILL_PARAM 4
 #define WAN_EXEC
 
-typedef struct timer {
+typedef struct mill_timer {
     double bitlength_less_than_beta;
     double extracting_data;
     double set_leaf_ots;
@@ -41,7 +41,7 @@ typedef struct timer {
     double extract_result;
     double bob_preform_leaf_ots;
     double bob_total;
-} mill_timer;
+};
 
 class MillionaireProtocol {
 public:
@@ -86,9 +86,9 @@ public:
 
   ~MillionaireProtocol() { delete triple_gen; }
 
-  mill_timer compare(uint8_t *res, uint64_t *data, int num_cmps, int bitlength,
+  void compare(uint8_t *res, uint64_t *data, int num_cmps, int bitlength,  mill_timer *timer,
                bool greater_than = true, bool equality = false,
-               int radix_base = MILL_PARAM, struct mill_timer timer*) {
+               int radix_base = 4) {
     configure(bitlength, radix_base);
 
     if (bitlength <= beta) {
@@ -132,7 +132,8 @@ public:
 
         delete[] choice;
       }
-      timer.bitlength_less_than_beta = sci::time_from(start);
+      timer->bitlength_less_than_beta = sci::time_from(start);
+      return;
     }
     auto start_extracting_data = sci::clock_start();
     auto start_alice = sci::clock_start();
@@ -168,7 +169,7 @@ public:
         else
           digits[i * num_cmps + j] =
               (uint8_t)(data_ext[j] >> i * beta) & mask_beta;
-    timer.extracting_data = sci::time_from(start_extracting_data);
+    timer->extracting_data = sci::time_from(start_extracting_data);
     if (party == sci::ALICE) {
       auto alice_start_set_up_ots = sci::clock_start();
       uint8_t *
@@ -207,7 +208,7 @@ public:
           }
         }
       }
-      timer.set_leaf_ots = sci::time_from(alice_start_set_up_ots);
+      timer->set_leaf_ots = sci::time_from(alice_start_set_up_ots);
       // Perform Leaf OTs
       auto timer_alice_preform_leaf_ots = sci::clock_start();
 #ifdef WAN_EXEC
@@ -238,13 +239,12 @@ public:
                                      num_cmps * (num_digits - 1), 2);
       }
 #endif
-      timer.alice_preform_leaf_ots = sci::time_from(timer_alice_preform_leaf_ots);
+      timer->alice_preform_leaf_ots = sci::time_from(timer_alice_preform_leaf_ots);
       // Cleanup
       for (int i = 0; i < num_digits * num_cmps; i++)
         delete[] leaf_ot_messages[i];
       delete[] leaf_ot_messages;
-      timer.alice_total = sci::time_from(start_alice);
-      return timer;
+      timer->alice_total = sci::time_from(start_alice);
     } else // party = sci::BOB
     {
       // Perform Leaf OTs
@@ -280,7 +280,7 @@ public:
                                      num_cmps * (num_digits - 1), 2);
       }
 #endif
-    timer.bob_preform_leaf_ots = sci::time_from(timer_bob_preform_leaf_ots);
+    timer->bob_preform_leaf_ots = sci::time_from(timer_bob_preform_leaf_ots);
       // Extract equality result from leaf_res_cmp
       for (int i = num_cmps; i < num_digits * num_cmps; i++) {
         leaf_res_eq[i] = leaf_res_cmp[i] & 1;
@@ -294,14 +294,14 @@ public:
       res[i] = leaf_res_cmp[i];
     }
     std::cout << std::endl;
-    timer.extract_result = sci::time_from(timer_extract_result);
+    timer->extract_result = sci::time_from(timer_extract_result);
     // Cleanup
     if (old_num_cmps != num_cmps)
       delete[] data_ext;
     delete[] digits;
     delete[] leaf_res_cmp;
     delete[] leaf_res_eq;
-    timer.bob_total = sci::time_from(start_bob);
+    timer->bob_total = sci::time_from(start_bob);
   }
 
   void set_leaf_ot_messages(uint8_t *ot_messages, uint8_t digit, int N,
