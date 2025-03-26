@@ -32,16 +32,16 @@ SOFTWARE.
 #define MILL_PARAM 4
 #define WAN_EXEC
 
-typedef struct mill_timer {
-    long long bitlength_less_than_beta;
-    long long extracting_data;
-    long long set_leaf_ots;
-    long long alice_preform_leaf_ots;
-    long long alice_total;
-    long long extract_result;
-    long long bob_preform_leaf_ots;
-    long long bob_total;
-};
+typedef struct timer {
+    double bitlength_less_than_beta;
+    double extracting_data;
+    double set_leaf_ots;
+    double alice_preform_leaf_ots;
+    double alice_total;
+    double extract_result;
+    double bob_preform_leaf_ots;
+    double bob_total;
+} mill_timer;
 
 class MillionaireProtocol {
 public:
@@ -88,12 +88,11 @@ public:
 
   mill_timer compare(uint8_t *res, uint64_t *data, int num_cmps, int bitlength,
                bool greater_than = true, bool equality = false,
-               int radix_base = MILL_PARAM) {
-    mill_timer timer = { 0 };
+               int radix_base = MILL_PARAM, struct mill_timer timer*) {
     configure(bitlength, radix_base);
 
     if (bitlength <= beta) {
-      auto start = clock_start();
+      auto start = sci::clock_start();
       uint8_t N = 1 << bitlength;
       uint8_t mask = N - 1;
       if (party == sci::ALICE) {
@@ -133,12 +132,11 @@ public:
 
         delete[] choice;
       }
-      timer.bitlength_less_than_beta = time_from(start);
-      return timer;
+      timer.bitlength_less_than_beta = sci::time_from(start);
     }
-    auto start_extracting_data = clock_start();
-    auto start_alice = clock_start();
-    auto start_bob = clock_start();
+    auto start_extracting_data = sci::clock_start();
+    auto start_alice = sci::clock_start();
+    auto start_bob = sci::clock_start();
     int old_num_cmps = num_cmps;
     // num_cmps should be a multiple of 8
     num_cmps = ceil(num_cmps / 8.0) * 8;
@@ -170,9 +168,9 @@ public:
         else
           digits[i * num_cmps + j] =
               (uint8_t)(data_ext[j] >> i * beta) & mask_beta;
-    timer.extracting_data = time_from(start_extracting_data);
+    timer.extracting_data = sci::time_from(start_extracting_data);
     if (party == sci::ALICE) {
-      auto alice_start_set_up_ots = clock_start();
+      auto alice_start_set_up_ots = sci::clock_start();
       uint8_t *
           *leaf_ot_messages; // (num_digits * num_cmps) X beta_pow (=2^beta)
       leaf_ot_messages = new uint8_t *[num_digits * num_cmps];
@@ -209,9 +207,9 @@ public:
           }
         }
       }
-      timer.set_leaf_ots = time_from(alice_start_set_up_ots);
+      timer.set_leaf_ots = sci::time_from(alice_start_set_up_ots);
       // Perform Leaf OTs
-      auto timer_alice_preform_leaf_ots = time_start();
+      auto timer_alice_preform_leaf_ots = sci::clock_start();
 #ifdef WAN_EXEC
       // otpack->kkot_beta->send(leaf_ot_messages, num_cmps*(num_digits), 2);
       otpack->kkot[beta - 1]->send(leaf_ot_messages, num_cmps * (num_digits),
@@ -240,17 +238,17 @@ public:
                                      num_cmps * (num_digits - 1), 2);
       }
 #endif
-      timer.alice_preform_leaf_ots = time_from(timer_alice_preform_leaf_ots);
+      timer.alice_preform_leaf_ots = sci::time_from(timer_alice_preform_leaf_ots);
       // Cleanup
       for (int i = 0; i < num_digits * num_cmps; i++)
         delete[] leaf_ot_messages[i];
       delete[] leaf_ot_messages;
-      timer.alice_total = time_from(start_alice);
+      timer.alice_total = sci::time_from(start_alice);
       return timer;
     } else // party = sci::BOB
     {
       // Perform Leaf OTs
-      auto timer_bob_preform_leaf_ots = time_start();
+      auto timer_bob_preform_leaf_ots = sci::clock_start();
 #ifdef WAN_EXEC
       // otpack->kkot_beta->recv(leaf_res_cmp, digits, num_cmps*(num_digits),
       // 2);
@@ -282,31 +280,28 @@ public:
                                      num_cmps * (num_digits - 1), 2);
       }
 #endif
-    timer.bob_preform_leaf_ots = time_from(timer_bob_preform_leaf_ots);
-    auto timer_extract_result = time_start();
+    timer.bob_preform_leaf_ots = sci::time_from(timer_bob_preform_leaf_ots);
       // Extract equality result from leaf_res_cmp
       for (int i = num_cmps; i < num_digits * num_cmps; i++) {
         leaf_res_eq[i] = leaf_res_cmp[i] & 1;
         leaf_res_cmp[i] >>= 1;
       }
     }
-
+    auto timer_extract_result = sci::clock_start();
     traverse_and_compute_ANDs(num_cmps, leaf_res_eq, leaf_res_cmp);
     for (int i = 0; i < old_num_cmps; i++) {
       std::cout << leaf_res_cmp[i] << " ";
       res[i] = leaf_res_cmp[i];
     }
     std::cout << std::endl;
-    timer.extract_result = time_from(timer_extract_result);
+    timer.extract_result = sci::time_from(timer_extract_result);
     // Cleanup
-    auto timer_bob_cleanup = time_start();
     if (old_num_cmps != num_cmps)
       delete[] data_ext;
     delete[] digits;
     delete[] leaf_res_cmp;
     delete[] leaf_res_eq;
-    timer.bob_total = time_from(start_bob);
-    return timer;
+    timer.bob_total = sci::time_from(start_bob);
   }
 
   void set_leaf_ot_messages(uint8_t *ot_messages, uint8_t digit, int N,
@@ -584,4 +579,4 @@ public:
   }
 };
 
-#endif // MILLIONAIRE_H__
+#endif // MILLIONAIRE_PROF_H__

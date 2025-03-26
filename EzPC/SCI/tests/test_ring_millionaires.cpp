@@ -63,7 +63,7 @@ int main(int argc, char **argv) {
 	    else {
 		printf("m failed ");
 	    }
-	    printf(" res: %u", res[i] ^ bob_res[i]);
+	    printf(" res: %u", res[i] ^ res_BOB[i]);
             std::cout << " ALICE data: " << data[i] << " BOB data: " << data_BOB[i] << std::endl;
         }	
     }
